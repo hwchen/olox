@@ -1,9 +1,12 @@
 package olox
 
-import "core:fmt"
 import "core:testing"
 
-main :: proc() {}
+main :: proc() {
+    chunk: Chunk
+    append(&chunk, cast(u8)OpCode.OP_RETURN)
+    chunk_disassemble(chunk, "test chunk")
+}
 
 @(test)
 test_main :: proc(t: ^testing.T) {
