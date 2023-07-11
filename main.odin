@@ -12,6 +12,8 @@ main :: proc() {
     chunk_write(&chunk, cast(u8)OpCode.OP_RETURN, 123)
 
     chunk_disassemble(chunk, "test chunk")
+
+    interpret(chunk)
 }
 
 @(test)
