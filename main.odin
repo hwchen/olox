@@ -4,7 +4,13 @@ import "core:testing"
 
 main :: proc() {
     chunk: Chunk
-    append(&chunk, cast(u8)OpCode.OP_RETURN)
+
+    const_idx := chunk_add_constant(&chunk, cast(Value)f64(1.2))
+    chunk_write(&chunk, cast(u8)OpCode.OP_CONSTANT, 123)
+    chunk_write(&chunk, cast(u8)const_idx, 123)
+
+    chunk_write(&chunk, cast(u8)OpCode.OP_RETURN, 123)
+
     chunk_disassemble(chunk, "test chunk")
 }
 
