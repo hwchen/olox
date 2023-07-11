@@ -52,7 +52,7 @@ instruction_disassemble :: proc(chunk: Chunk, offset: int) -> int {
         fmt.printf("%-16s %4d '%v'\n", opcode, const_idx, const_val)
         return offset + 2
     case .OP_RETURN:
-        fmt.printf("%s\n ", opcode)
+        fmt.printf("%s\n", opcode)
         return offset + 1
     case:
         fmt.printf("Unknown opcode %d\n", opcode)

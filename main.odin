@@ -1,6 +1,9 @@
 package olox
 
+import "core:os"
 import "core:testing"
+
+DEBUG_TRACE_EXECUTION :: #config(DEBUG_TRACE_EXECUTION, false)
 
 main :: proc() {
     chunk: Chunk

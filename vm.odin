@@ -15,6 +15,10 @@ interpret :: proc(chunk: Chunk) -> InterpretResult {
     ip := 0
 
     for {
+        if DEBUG_TRACE_EXECUTION {
+            instruction_disassemble(chunk, ip)
+        }
+
         opcode := cast(OpCode)chunk.code[ip]
         ip += 1
         switch opcode {
@@ -24,7 +28,7 @@ interpret :: proc(chunk: Chunk) -> InterpretResult {
             const_idx := chunk.code[ip]
             constant := chunk.constants[const_idx]
             ip += 1
-            fmt.printf("%v", constant)
+            fmt.printf("%v\n", constant)
         }
     }
 }
