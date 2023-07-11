@@ -1,6 +1,7 @@
 package olox
 
 import "core:fmt"
+import "core:reflect"
 
 OpCode :: enum u8 {
     OP_CONSTANT,
@@ -48,10 +49,10 @@ instruction_disassemble :: proc(chunk: Chunk, offset: int) -> int {
     case .OP_CONSTANT:
         const_idx := chunk.code[offset + 1]
         const_val := chunk.constants[const_idx]
-        fmt.printf("%-16s %4d '%v'\n", "OP_CONSTANT", const_idx, const_val)
+        fmt.printf("%-16s %4d '%v'\n", opcode, const_idx, const_val)
         return offset + 2
     case .OP_RETURN:
-        fmt.printf("%s\n ", "OP_RETURN")
+        fmt.printf("%s\n ", opcode)
         return offset + 1
     case:
         fmt.printf("Unknown opcode %d\n", opcode)
