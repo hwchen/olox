@@ -5,6 +5,7 @@ import "core:reflect"
 
 OpCode :: enum u8 {
     OP_CONSTANT,
+    OP_NEGATE,
     OP_RETURN,
 }
 
@@ -51,7 +52,7 @@ instruction_disassemble :: proc(chunk: Chunk, offset: int) -> int {
         const_val := chunk.constants[const_idx]
         fmt.printf("%-16s %4d '%v'\n", opcode, const_idx, const_val)
         return offset + 2
-    case .OP_RETURN:
+    case .OP_NEGATE, .OP_RETURN:
         fmt.printf("%s\n", opcode)
         return offset + 1
     case:

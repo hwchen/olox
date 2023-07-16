@@ -29,15 +29,18 @@ interpret :: proc(chunk: Chunk) -> InterpretResult {
         opcode := cast(OpCode)chunk.code[ip]
         ip += 1
         switch opcode {
-        case .OP_RETURN:
-            constant := pop(&stack)
-            fmt.printf("%v\n", constant)
-            return .INTERPRET_OK
         case .OP_CONSTANT:
             const_idx := chunk.code[ip]
             constant := chunk.constants[const_idx]
             ip += 1
             append(&stack, constant)
+        case .OP_NEGATE:
+            constant := pop(&stack)
+            append(&stack, -1 * constant)
+        case .OP_RETURN:
+            constant := pop(&stack)
+            fmt.printf("%v\n", constant)
+            return .INTERPRET_OK
         }
     }
 }
