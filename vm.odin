@@ -4,55 +4,59 @@ import "core:fmt"
 import "core:mem"
 import "core:reflect"
 
+Vm :: struct {
+    // not a pointer; book says pointers are faster, but it's not clear that's the case now.
+    // https://stackoverflow.com/questions/2305770/efficiency-arrays-vs-pointers
+    ip:    int,
+    stack: [dynamic]Value,
+}
+
 InterpretResult :: enum {
     INTERPRET_OK,
     INTERPRET_COMPILER_ERROR,
     INTERPRET_RUNTIME_ERROR,
 }
 
-interpret :: proc(chunk: Chunk) -> InterpretResult {
-    // not a pointer; book says pointers are faster, but it's not clear that's the case now.
-    // https://stackoverflow.com/questions/2305770/efficiency-arrays-vs-pointers
-    ip := 0
-    stack: [dynamic]Value
+vm_interpret :: proc(vm: ^Vm, chunk: Chunk) -> InterpretResult {
+    if len(chunk.code) == 0 do return .INTERPRET_OK
 
     for {
         if DEBUG_TRACE_EXECUTION {
             fmt.printf("     ")
-            for v in stack {
+            for v in vm.stack {
                 fmt.printf("[ %v ]", v)
             }
             fmt.println()
 
-            instruction_disassemble(chunk, ip)
+            instruction_disassemble(chunk, vm.ip)
         }
 
-        opcode := cast(OpCode)chunk.code[ip]
-        ip += 1
+        opcode := cast(OpCode)chunk.code[vm.ip]
+        vm.ip += 1
         switch opcode {
         case .OP_CONSTANT:
-            const_idx := chunk.code[ip]
+            const_idx := chunk.code[vm.ip]
             constant := chunk.constants[const_idx]
-            ip += 1
-            append(&stack, constant)
+            vm.ip += 1
+            append(&vm.stack, constant)
         case .OP_NEGATE:
-            constant := pop(&stack)
-            append(&stack, -1 * constant)
+            constant := pop(&vm.stack)
+            append(&vm.stack, -1 * constant)
         case .OP_ADD, .OP_SUBTRACT, .OP_MULTIPLY, .OP_DIVIDE:
-            b := pop(&stack)
-            a := pop(&stack)
+            b := pop(&vm.stack)
+            a := pop(&vm.stack)
             #partial switch opcode {
             case .OP_ADD:
-                append(&stack, a + b)
+                append(&vm.stack, a + b)
             case .OP_SUBTRACT:
-                append(&stack, a - b)
+                append(&vm.stack, a - b)
             case .OP_MULTIPLY:
-                append(&stack, a * b)
+                append(&vm.stack, a * b)
             case .OP_DIVIDE:
-                append(&stack, a / b)
+                append(&vm.stack, a / b)
             }
         case .OP_RETURN:
-            constant := pop(&stack)
+            constant := pop(&vm.stack)
             fmt.printf("%v\n", constant)
             return .INTERPRET_OK
         }

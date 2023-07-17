@@ -1,28 +1,52 @@
 package olox
 
+import "core:bufio"
 import "core:os"
+import "core:fmt"
 import "core:testing"
 
 DEBUG_TRACE_EXECUTION :: #config(DEBUG_TRACE_EXECUTION, false)
 
 main :: proc() {
-    // Prepare chunk
-    chunk: Chunk
-
-    chunk_write_constant(&chunk, 1.2, 123)
-    chunk_write_constant(&chunk, 3.4, 123)
-    chunk_write(&chunk, cast(u8)OpCode.OP_ADD, 123)
-    chunk_write_constant(&chunk, 5.6, 123)
-    chunk_write(&chunk, cast(u8)OpCode.OP_DIVIDE, 123)
-    chunk_write(&chunk, cast(u8)OpCode.OP_NEGATE, 123)
-    chunk_write(&chunk, cast(u8)OpCode.OP_RETURN, 123)
-
-    // Disassemble and interpret chunk
-    chunk_disassemble(chunk, "test chunk")
-    interpret(chunk)
+    if len(os.args) == 1 {
+        repl()
+    } else if len(os.args) == 2 {
+        //run_file(os.args[1])
+        fmt.eprintln("Files not yet supported")
+        os.exit(128)
+    } else {
+        fmt.eprintln("Usage: olox [path]")
+        os.exit(64)
+    }
 }
 
-@(test)
-test_main :: proc(t: ^testing.T) {
-    testing.expect_value(t, 1 + 1, 2)
+repl :: proc() {
+    vm: Vm
+
+    rdr: bufio.Reader
+    buf: [1024]u8
+    bufio.reader_init_with_buf(&rdr, os.stream_from_handle(os.stdin), buf[:])
+
+    for {
+        fmt.print("> ")
+
+        line, err := bufio.reader_read_slice(&rdr, '\n');if err != nil do break
+        chunk := compile(line)
+        vm_interpret(&vm, chunk)
+    }
+}
+
+run_file :: proc(path: string) {
+    vm: Vm
+    src, _ := os.read_entire_file(path)
+    chunk := compile(src)
+    result := vm_interpret(&vm, chunk)
+
+    switch result {
+    case .INTERPRET_COMPILER_ERROR:
+        os.exit(65)
+    case .INTERPRET_RUNTIME_ERROR:
+        os.exit(70)
+    case .INTERPRET_OK:
+    }
 }
