@@ -9,15 +9,12 @@ main :: proc() {
     // Prepare chunk
     chunk: Chunk
 
-    // write constant 1.2
-    const_idx := chunk_add_constant(&chunk, cast(Value)f64(1.2))
-    chunk_write(&chunk, cast(u8)OpCode.OP_CONSTANT, 123)
-    chunk_write(&chunk, cast(u8)const_idx, 123)
-
-    // negate 1.2
+    chunk_write_constant(&chunk, 1.2, 123)
+    chunk_write_constant(&chunk, 3.4, 123)
+    chunk_write(&chunk, cast(u8)OpCode.OP_ADD, 123)
+    chunk_write_constant(&chunk, 5.6, 123)
+    chunk_write(&chunk, cast(u8)OpCode.OP_DIVIDE, 123)
     chunk_write(&chunk, cast(u8)OpCode.OP_NEGATE, 123)
-
-    // return
     chunk_write(&chunk, cast(u8)OpCode.OP_RETURN, 123)
 
     // Disassemble and interpret chunk

@@ -37,6 +37,19 @@ interpret :: proc(chunk: Chunk) -> InterpretResult {
         case .OP_NEGATE:
             constant := pop(&stack)
             append(&stack, -1 * constant)
+        case .OP_ADD, .OP_SUBTRACT, .OP_MULTIPLY, .OP_DIVIDE:
+            b := pop(&stack)
+            a := pop(&stack)
+            #partial switch opcode {
+            case .OP_ADD:
+                append(&stack, a + b)
+            case .OP_SUBTRACT:
+                append(&stack, a - b)
+            case .OP_MULTIPLY:
+                append(&stack, a * b)
+            case .OP_DIVIDE:
+                append(&stack, a / b)
+            }
         case .OP_RETURN:
             constant := pop(&stack)
             fmt.printf("%v\n", constant)

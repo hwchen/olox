@@ -6,6 +6,10 @@ import "core:reflect"
 OpCode :: enum u8 {
     OP_CONSTANT,
     OP_NEGATE,
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_MULTIPLY,
+    OP_DIVIDE,
     OP_RETURN,
 }
 
@@ -23,6 +27,13 @@ chunk_write :: proc(chunk: ^Chunk, byte: u8, line: int) {
     append(&chunk.lines, line)
 }
 
+chunk_write_constant :: proc(chunk: ^Chunk, v: Value, line: int) {
+    const_idx := chunk_add_constant(chunk, cast(Value)f64(v))
+    chunk_write(chunk, cast(u8)OpCode.OP_CONSTANT, line)
+    chunk_write(chunk, cast(u8)const_idx, line)
+}
+
+@(private)
 chunk_add_constant :: proc(chunk: ^Chunk, value: Value) -> int {
     append(&chunk.constants, value)
     return len(chunk.constants) - 1
@@ -52,7 +63,7 @@ instruction_disassemble :: proc(chunk: Chunk, offset: int) -> int {
         const_val := chunk.constants[const_idx]
         fmt.printf("%-16s %4d '%v'\n", opcode, const_idx, const_val)
         return offset + 2
-    case .OP_NEGATE, .OP_RETURN:
+    case .OP_NEGATE, .OP_ADD, .OP_SUBTRACT, .OP_MULTIPLY, .OP_DIVIDE, .OP_RETURN:
         fmt.printf("%s\n", opcode)
         return offset + 1
     case:
