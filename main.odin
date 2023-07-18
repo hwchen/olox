@@ -43,10 +43,10 @@ run_file :: proc(path: string) {
     result := vm_interpret(&vm, chunk)
 
     switch result {
-    case .INTERPRET_COMPILER_ERROR:
+    case .CompilerError:
         os.exit(65)
-    case .INTERPRET_RUNTIME_ERROR:
+    case .RuntimeError:
         os.exit(70)
-    case .INTERPRET_OK:
+    case .Ok:
     }
 }

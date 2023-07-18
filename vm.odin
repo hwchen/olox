@@ -12,13 +12,13 @@ Vm :: struct {
 }
 
 InterpretResult :: enum {
-    INTERPRET_OK,
-    INTERPRET_COMPILER_ERROR,
-    INTERPRET_RUNTIME_ERROR,
+    Ok,
+    CompilerError,
+    RuntimeError,
 }
 
 vm_interpret :: proc(vm: ^Vm, chunk: Chunk) -> InterpretResult {
-    if len(chunk.code) == 0 do return .INTERPRET_OK
+    if len(chunk.code) == 0 do return .Ok
 
     for {
         if DEBUG_TRACE_EXECUTION {
@@ -34,43 +34,43 @@ vm_interpret :: proc(vm: ^Vm, chunk: Chunk) -> InterpretResult {
         opcode := cast(OpCode)chunk.code[vm.ip]
         vm.ip += 1
         switch opcode {
-        case .OP_CONSTANT:
+        case .Constant:
             const_idx := chunk.code[vm.ip]
             constant := chunk.constants[const_idx]
             vm.ip += 1
             append(&vm.stack, constant)
-        case .OP_NEGATE:
+        case .Negate:
             constant := pop(&vm.stack)
             append(&vm.stack, -1 * constant)
-        case .OP_ADD, .OP_SUBTRACT, .OP_MULTIPLY, .OP_DIVIDE:
+        case .Add, .Subtract, .Multiply, .Divide:
             b := pop(&vm.stack)
             a := pop(&vm.stack)
             #partial switch opcode {
-            case .OP_ADD:
+            case .Add:
                 append(&vm.stack, a + b)
-            case .OP_SUBTRACT:
+            case .Subtract:
                 append(&vm.stack, a - b)
-            case .OP_MULTIPLY:
+            case .Multiply:
                 append(&vm.stack, a * b)
-            case .OP_DIVIDE:
+            case .Divide:
                 append(&vm.stack, a / b)
             }
-        case .OP_RETURN:
+        case .Return:
             constant := pop(&vm.stack)
             fmt.printf("%v\n", constant)
-            return .INTERPRET_OK
+            return .Ok
         }
     }
 }
 
 OpCode :: enum u8 {
-    OP_CONSTANT,
-    OP_NEGATE,
-    OP_ADD,
-    OP_SUBTRACT,
-    OP_MULTIPLY,
-    OP_DIVIDE,
-    OP_RETURN,
+    Constant,
+    Negate,
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    Return,
 }
 
 Value :: distinct f64
@@ -89,7 +89,7 @@ chunk_write :: proc(chunk: ^Chunk, byte: u8, line: int) {
 
 chunk_write_constant :: proc(chunk: ^Chunk, v: Value, line: int) {
     const_idx := chunk_add_constant(chunk, cast(Value)f64(v))
-    chunk_write(chunk, cast(u8)OpCode.OP_CONSTANT, line)
+    chunk_write(chunk, cast(u8)OpCode.Constant, line)
     chunk_write(chunk, cast(u8)const_idx, line)
 }
 
@@ -118,12 +118,12 @@ instruction_disassemble :: proc(chunk: Chunk, offset: int) -> int {
 
     opcode := cast(OpCode)chunk.code[offset]
     switch opcode {
-    case .OP_CONSTANT:
+    case .Constant:
         const_idx := chunk.code[offset + 1]
         const_val := chunk.constants[const_idx]
         fmt.printf("%-16s %4d '%v'\n", opcode, const_idx, const_val)
         return offset + 2
-    case .OP_NEGATE, .OP_ADD, .OP_SUBTRACT, .OP_MULTIPLY, .OP_DIVIDE, .OP_RETURN:
+    case .Negate, .Add, .Subtract, .Multiply, .Divide, .Return:
         fmt.printf("%s\n", opcode)
         return offset + 1
     case:
