@@ -18,7 +18,7 @@ compile :: proc(src: []u8) -> Chunk {
         }
         fmt.printf("%v '%s'\n", token.type, token_lexeme(token, src))
 
-        if token.type == .EOF do break
+        if token.type == .Eof do break
     }
 
     chunk: Chunk

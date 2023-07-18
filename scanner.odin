@@ -27,24 +27,24 @@ Token :: struct {
 }
 
 TokenType :: enum {
-    EOF = 0,
+    Eof = 0,
 
     // single-character tokens
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    LeftParen, RightParen, LeftBrace, RightBrace,
+    Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
 
     // one or two character tokens
-    BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
+    Bang, BangEqual, Equal, EqualEqual,
+    Greater, GreaterEqual, Less, LessEqual,
 
     // literals
-    IDENTIFIER, STRING, NUMBER,
+    Identifier, String, Number,
 
     // keywords
-    AND, CLASS, ELSE, FALSE, FOR, FUN, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    And, Class, Else, False, For, Fun, If, Nil, Or,
+    Print, Return, Super, This, True, Var, While,
 
-    ERROR
+    Error
 }
 
 token_lexeme :: proc(token: Token, src: []u8) -> []u8 {
