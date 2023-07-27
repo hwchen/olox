@@ -1,9 +1,12 @@
 package olox
 
 Scanner :: struct {
+    src: []u8,
     start:   int,
     current: int,
     line:    int,
+
+    err_msg: Maybe(string),
 }
 
 scanner: Scanner
@@ -15,9 +18,38 @@ scanner_init :: proc() {
 }
 
 scan_token :: proc() -> Token {
-    token : Token
-    return token
+    scanner.start = scanner.current;
+
+    if is_end() do return make_token(.Eof);
+
+    return error_token("Unexpected character.")
 }
+
+is_end :: proc() -> bool {
+    return scanner.current >= len(scanner.src)
+}
+
+make_token :: proc(type: TokenType) -> Token {
+    return Token {
+        type = type,
+        start = scanner.start,
+        length = scanner.current - scanner.start,
+        line = scanner.line,
+    };
+}
+
+// Hack for storing error messages. In clox, these are defined inline as string literals,
+// and then start is set to that pointer. Here, we'll store the err msg in the scanner and
+// retrieve it in a separate step.
+//
+// TODO: not sure if clox scanner does early return on errors, will have to restructure if not.
+error_token :: proc(msg: string) -> Token {
+    scanner.err_msg = msg
+
+    return make_token(.Error)
+}
+
+// === Tokens ===
 
 Token :: struct {
     type:   TokenType,
