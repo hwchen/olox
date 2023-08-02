@@ -11,12 +11,12 @@
       # TODO: only needed when nixpkgs is not up to date.
       odin-overlay = self: super: {
         odin = super.odin.overrideAttrs (old: rec {
-          version = "dev-2023-07";
+          version = "9453b2387b2cc7c473547997703c305e7982f5e4"; # 2023-08-01
           src = super.fetchFromGitHub {
             owner = "odin-lang";
             repo = "Odin";
             rev = "${version}";
-            sha256 = "sha256-ksCK1Qmjbg5ZgFoq0I4cjrWaCxd+UW7f1NLcSjCPMwE=";
+            sha256 = "pmgrauhB5/JWBkwrAm7tCml9IYQhXyGXsNVDKTntA0M=";
           };
 
           nativeBuildInputs = with super; [ makeWrapper which ];
@@ -34,12 +34,12 @@
 
       ols-overlay = self: super: {
         ols = super.ols.overrideAttrs (old: rec {
-          version = "nightly-2023-07-08-0af33a6";
+          version = "nightly-2023-07-29-a010fd2";
           src = super.fetchFromGitHub {
             owner = "DanielGavin";
             repo = "ols";
-            rev = "0af33a64747670545eaf31d1449586ff8f08b0f9";
-            sha256 = "sha256-MNl3mcVWG4Tc4xgb1bnkCZu+rZlgLh2W+sr2s2klpm4=";
+            rev = "a010fd2c8f9c3b3bd4cec75022c50aac94c0cb02";
+            sha256 = "mAAgbc2SzC/scxDSTyN9CtLUaYI9kNvMRvKaXT9P20s=";
           };
 
           installPhase = old.installPhase;
