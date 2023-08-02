@@ -60,6 +60,9 @@
         pkgs.odin
         pkgs.ols
         ];
+
+        # for ols
+        ODIN_ROOT = "${pkgs.odin}/share";
       };
     });
 }
