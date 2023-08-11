@@ -22,7 +22,40 @@ scan_token :: proc() -> Token {
 
     if is_end() do return make_token(.Eof);
 
+    c := advance()
+
+    switch c {
+        case '(': return make_token(.LeftParen)
+        case ')': return make_token(.RightParen)
+        case '{': return make_token(.LeftBrace)
+        case '}': return make_token(.RightBrace)
+        case ';': return make_token(.Semicolon)
+        case ',': return make_token(.Comma)
+        case '.': return make_token(.Dot)
+        case '-': return make_token(.Minus)
+        case '+': return make_token(.Plus)
+        case '/': return make_token(.Slash)
+        case '*': return make_token(.Star)
+        case '!': return make_token(match('=') ? .BangEqual : .Bang)
+        case '=': return make_token(match('=') ? .EqualEqual : .Equal)
+        case '<': return make_token(match('=') ? .LessEqual : .Less)
+        case '>': return make_token(match('=') ? .GreaterEqual : .Greater)
+    }
+
     return error_token("Unexpected character.")
+}
+
+advance :: proc() -> u8 {
+    scanner.current += 1
+    return scanner.src[scanner.current]
+}
+
+// advances if matches
+match :: proc(expected: u8) -> bool {
+    if is_end() do return false
+    if scanner.src[scanner.current] != expected do return false
+    scanner.current += 1
+    return true
 }
 
 is_end :: proc() -> bool {
