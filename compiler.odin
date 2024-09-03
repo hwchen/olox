@@ -4,7 +4,7 @@ import "core:fmt"
 
 compile :: proc(src: []u8) -> Chunk {
 	// scanner uses file-level global variable
-	scanner_init()
+	scanner_init(src)
 
 	// temporary to drive the scanner
 	line := -1

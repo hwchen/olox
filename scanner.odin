@@ -1,5 +1,7 @@
 package olox
 
+import "core:fmt"
+
 Scanner :: struct {
 	src:     []u8,
 	start:   int,
@@ -10,7 +12,8 @@ Scanner :: struct {
 
 scanner: Scanner
 
-scanner_init :: proc() {
+scanner_init :: proc(src: []u8) {
+	scanner.src = src
 	scanner.start = 0
 	scanner.current = 0
 	scanner.line = 1
@@ -20,7 +23,9 @@ scan_token :: proc() -> Token {
 	skip_whitespace()
 	scanner.start = scanner.current
 
-	if is_end() do return make_token(.Eof)
+	if is_end() {
+		return make_token(.Eof)
+	}
 
 	c := advance()
 	
@@ -41,14 +46,47 @@ scan_token :: proc() -> Token {
 	case '=': return make_token(match('=') ? .EqualEqual : .Equal)
 	case '<': return make_token(match('=') ? .LessEqual : .Less)
 	case '>': return make_token(match('=') ? .GreaterEqual : .Greater)
+    case '"': return make_string_token()
+    case '0'..= '9': return make_number_token()
 	}
 	// odinfmt: enable
 
 	return error_token("Unexpected character.")
 }
 
+make_string_token :: proc() -> Token {
+	for peek() != '"' && !is_end() {
+		if peek() == '\n' {
+			scanner.line += 1
+		}
+		advance()
+	}
+	if is_end() {
+		return error_token("Unterminated string")
+	}
+	advance() // the closing quote
+	return make_token(.String)
+}
+
+make_number_token :: proc() -> Token {
+	for is_digit(peek()) {
+		advance()
+	}
+	// fractional part
+	if peek() == '.' && is_digit(peek_next()) {
+		advance()
+		for is_digit(peek()) {
+			advance()
+		}
+	}
+	return make_token(.Number)
+}
+
 skip_whitespace :: proc() {
 	for {
+		if is_end() {
+			return
+		}
 		c := peek()
 		switch c {
 		case ' ', '\r', '\t':
@@ -56,6 +94,15 @@ skip_whitespace :: proc() {
 		case '\n':
 			scanner.line += 1
 			advance()
+		case '/':
+			// comments
+			if peek_next() == '/' {
+				for peek() != '\n' && !is_end() {
+					advance()
+				}
+			} else {
+				return
+			}
 		case:
 			return
 		}
@@ -64,11 +111,17 @@ skip_whitespace :: proc() {
 
 advance :: proc() -> u8 {
 	scanner.current += 1
-	return scanner.src[scanner.current]
+	return scanner.src[scanner.current - 1]
 }
 
 peek :: proc() -> u8 {
 	return scanner.src[scanner.current]
+}
+
+// returns \0 if not 
+peek_next :: proc() -> u8 {
+	if is_end() do return 0
+	return scanner.src[scanner.current + 1]
 }
 
 // advances if matches
@@ -81,6 +134,10 @@ match :: proc(expected: u8) -> bool {
 
 is_end :: proc() -> bool {
 	return scanner.current >= len(scanner.src)
+}
+
+is_digit :: proc(c: u8) -> bool {
+	return c >= '0' && c <= '9'
 }
 
 make_token :: proc(type: TokenType) -> Token {
