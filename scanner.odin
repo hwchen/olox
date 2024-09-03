@@ -46,9 +46,9 @@ scan_token :: proc() -> Token {
 	case '=': return make_token(match('=') ? .EqualEqual : .Equal)
 	case '<': return make_token(match('=') ? .LessEqual : .Less)
 	case '>': return make_token(match('=') ? .GreaterEqual : .Greater)
-    case '"': return make_string_token()
-    case '0'..= '9': return make_number_token()
-    case 'a' ..= 'z', 'A' ..= 'Z': return make_ident_token()
+	case '"': return make_string_token()
+	case '0'..= '9': return make_number_token()
+	case 'a' ..= 'z', 'A' ..= 'Z': return make_ident_token()
 	}
 	// odinfmt: enable
 
@@ -187,22 +187,24 @@ make_ident_token :: proc() -> Token {
 
 try_keyword :: proc(s: []u8) -> (kw: TokenType, ok: bool) {
 	s := string(s)
-	if s == "and" do return .And, true
-	if s == "class" do return .Class, true
-	if s == "else" do return .Else, true
-	if s == "false" do return .False, true
-	if s == "for" do return .For, true
-	if s == "fun" do return .Fun, true
-	if s == "if" do return .If, true
-	if s == "nil" do return .Nil, true
-	if s == "or" do return .Or, true
-	if s == "print" do return .Print, true
+	// odinfmt: disable
+	if s == "and"    do return .And,    true
+	if s == "class"  do return .Class,  true
+	if s == "else"   do return .Else,   true
+	if s == "false"  do return .False,  true
+	if s == "for"    do return .For,    true
+	if s == "fun"    do return .Fun,    true
+	if s == "if"     do return .If,     true
+	if s == "nil"    do return .Nil,    true
+	if s == "or"     do return .Or,     true
+	if s == "print"  do return .Print,  true
 	if s == "return" do return .Return, true
-	if s == "super" do return .Super, true
-	if s == "this" do return .This, true
-	if s == "true" do return .True, true
-	if s == "var" do return .Var, true
-	if s == "while" do return .While, true
+	if s == "super"  do return .Super,  true
+	if s == "this"   do return .This,   true
+	if s == "true"   do return .True,   true
+	if s == "var"    do return .Var,    true
+	if s == "while"  do return .While,  true
+	// odinfmt: enable
 	return .Error, false
 }
 
@@ -218,22 +220,22 @@ Token :: struct {
 // odinfmt: disable
 TokenType :: enum {
 	Eof = 0,
-	
+
 	// single-character tokens
 	LeftParen, RightParen, LeftBrace, RightBrace,
 	Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
-	
+
 	// one or two character tokens
 	Bang, BangEqual, Equal, EqualEqual,
 	Greater, GreaterEqual, Less, LessEqual,
-	
+
 	// literals
 	Identifier, String, Number,
-	
+
 	// keywords
 	And, Class, Else, False, For, Fun, If, Nil, Or,
 	Print, Return, Super, This, True, Var, While,
-	
+
 	Error,
 }
 // odinfmt: enable
